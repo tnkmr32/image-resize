@@ -1,31 +1,10 @@
-import React, { useRef, useState } from "react";
-// import logo from "./logo.svg";
+import React, { useMemo, useRef, useState } from "react";
 import { saveAs } from "file-saver";
 import "./App.css";
 import Konva from "konva";
-import { Layer, Rect, Stage, Text, Image } from "react-konva";
+import { Layer, Stage, Image, Rect } from "react-konva";
 import axios from "axios";
 import useImage from "use-image";
-
-const ColoredRect = () => {
-  const [color, setColor] = useState("green");
-
-  const handleClick = () => {
-    setColor(Konva.Util.getRandomColor());
-  };
-
-  return (
-    <Rect
-      x={20}
-      y={20}
-      width={50}
-      height={50}
-      fill={color}
-      shadowBlur={5}
-      onClick={handleClick}
-    />
-  );
-};
 
 const downloadImage = async (src: string, fileName?: string) => {
   try {
@@ -36,6 +15,15 @@ const downloadImage = async (src: string, fileName?: string) => {
   } catch (error) {
     console.error("Image download failed", error);
   }
+};
+
+type ColoredRectProps = {
+  color: string;
+  width: number;
+  height: number;
+};
+const ColoredRect = (props: ColoredRectProps) => {
+  return <Rect width={props.width} height={props.height} fill={props.color} />;
 };
 
 function App() {
@@ -59,6 +47,15 @@ function App() {
     });
   };
 
+  const MARGIN_DEFAULT = 50;
+  const [margin, setMargin] = useState(MARGIN_DEFAULT);
+  const onChangeSlider = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.value) return;
+    const num = Number(e.target.value);
+    if (isNaN(num)) return;
+    setMargin(num);
+  };
+
   const stageRef = useRef<Konva.Stage>(null);
 
   const handleOnSubmit = () => {
@@ -67,52 +64,91 @@ function App() {
     if (temp == null) return null;
 
     // データURL形式で値を取得できる
-    const result = temp.toDataURL();
+    const result = temp.toDataURL({ pixelRatio: 3 });
 
     // resultを使って、ここから先は任意の保存処理など...
     downloadImage(result);
   };
 
-  console.log(profileImage?.blob);
   const [image] = useImage(profileImage?.blob ?? "");
 
+  const canvasSize = 500;
+  const imageProps = useMemo(() => {
+    if (image === undefined) {
+      return { width: 0, height: 0, x: 0, y: 0 };
+    }
+
+    // marginを込で大きい辺を500にする
+    const aspect = image.width / image.height; // 1以上が横向き
+
+    let width = 0;
+    let height = 0;
+    if (aspect >= 1) {
+      width = canvasSize - margin * 2;
+      height = width / aspect;
+    } else {
+      height = canvasSize - margin * 2;
+      width = height * aspect;
+    }
+
+    const x = (canvasSize - width) / 2;
+    const y = (canvasSize - height) / 2;
+
+    return { width, height, x, y };
+  }, [image, margin]);
+
   return (
-    <div className="flex justify-center items-center mt-8">
-      <img
-        src={profileImage?.blob}
-        className="profileImage"
-        alt="profileImage"
-      />
-      <input
-        type="file"
-        accept="image/*"
-        onChange={onFileInputChange}
-        className="pl-4"
-      />
-      <img
-        src={profileImage?.blob}
-        className="processedImage"
-        alt="processedImage"
-      />
-      <Stage ref={stageRef} width={500} height={500}>
-        <Layer>
-          <Text text="Try click on rect" />
-          <ColoredRect />
-          <Image image={image} width={400} height={400}/>
-        </Layer>
-      </Stage>
-      <button
-        className="saveButton"
-        type="button"
-        onClick={async () => {
-          // if (profileImage !== undefined) {
-          //   await downloadImage(profileImage.blob, profileImage.name);
-          // }
-          handleOnSubmit();
-        }}
-      >
-        SaveImage
-      </button>
+    <div className="container">
+      <div className="canvas">
+        <Stage ref={stageRef} width={canvasSize} height={canvasSize}>
+          <Layer>
+            <ColoredRect
+              width={canvasSize}
+              height={canvasSize}
+              color="#f2f0ee"
+            />
+            <Image
+              image={image}
+              width={imageProps.width}
+              height={imageProps.height}
+              x={imageProps.x}
+              y={imageProps.y}
+            />
+          </Layer>
+        </Stage>
+      </div>
+      <div className="controlPanel">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={onFileInputChange}
+          className="pl-4"
+        />
+        <div>
+          余白の幅
+          <input
+            type="range"
+            accept="image/*"
+            value={margin}
+            onChange={onChangeSlider}
+            className="pl-4"
+            onDoubleClick={() => setMargin(MARGIN_DEFAULT)}
+          />
+        </div>
+
+        <button
+          className="saveButton"
+          type="button"
+          onClick={async () => {
+            // if (profileImage !== undefined) {
+            //   await downloadImage(profileImage.blob, profileImage.name);
+            // }
+            handleOnSubmit();
+          }}
+        >
+          画像を保存する
+        </button>
+      </div>
     </div>
   );
 }
