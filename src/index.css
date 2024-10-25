@@ -18,6 +18,12 @@ body {
   gap: 20px;
 }
 
+.adjustMargin {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
@@ -34,6 +40,7 @@ code {
 
 .canvas {
   border: solid 1px #000000;
+  /* background-color: #fcfaf7; */
   width: fit-content;
   height: fit-content;
 }

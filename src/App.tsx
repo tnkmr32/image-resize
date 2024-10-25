@@ -18,9 +18,9 @@ const downloadImage = async (src: string, fileName?: string) => {
 };
 
 type ColoredRectProps = {
-  color: string;
   width: number;
   height: number;
+  color?: string;
 };
 const ColoredRect = (props: ColoredRectProps) => {
   return <Rect width={props.width} height={props.height} fill={props.color} />;
@@ -36,10 +36,8 @@ function App() {
 
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-
     // React.ChangeEvent<HTMLInputElement>よりファイルを取得
     const fileObject = e.target.files[0];
-
     // オブジェクトURLを生成し、useState()を更新
     setProfileImage({
       blob: window.URL.createObjectURL(fileObject),
@@ -47,8 +45,10 @@ function App() {
     });
   };
 
+  const canvasSize = 500;
   const MARGIN_DEFAULT = 50;
   const [margin, setMargin] = useState(MARGIN_DEFAULT);
+  
   const onChangeSlider = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.value) return;
     const num = Number(e.target.value);
@@ -58,28 +58,23 @@ function App() {
 
   const stageRef = useRef<Konva.Stage>(null);
 
-  const handleOnSubmit = () => {
+  const handleOnDownload = async() => {
     const temp = stageRef.current;
-
     if (temp == null) return null;
-
     // データURL形式で値を取得できる
     const result = temp.toDataURL({ pixelRatio: 3 });
-
-    // resultを使って、ここから先は任意の保存処理など...
-    downloadImage(result);
+    await downloadImage(result, profileImage?.name);
   };
 
   const [image] = useImage(profileImage?.blob ?? "");
 
-  const canvasSize = 500;
   const imageProps = useMemo(() => {
     if (image === undefined) {
       return { width: 0, height: 0, x: 0, y: 0 };
     }
 
-    // marginを込で大きい辺を500にする
-    const aspect = image.width / image.height; // 1以上が横向き
+    // アスペクト比。1以上が横向き
+    const aspect = image.width / image.height; 
 
     let width = 0;
     let height = 0;
@@ -105,7 +100,7 @@ function App() {
             <ColoredRect
               width={canvasSize}
               height={canvasSize}
-              color="#f2f0ee"
+              color="#fcfaf7"
             />
             <Image
               image={image}
@@ -124,7 +119,7 @@ function App() {
           onChange={onFileInputChange}
           className="pl-4"
         />
-        <div>
+        <div className="adjustMargin">
           余白の幅
           <input
             type="range"
@@ -140,13 +135,10 @@ function App() {
           className="saveButton"
           type="button"
           onClick={async () => {
-            // if (profileImage !== undefined) {
-            //   await downloadImage(profileImage.blob, profileImage.name);
-            // }
-            handleOnSubmit();
+            handleOnDownload();
           }}
         >
-          画像を保存する
+          画像を保存
         </button>
       </div>
     </div>
