@@ -61,8 +61,8 @@ function App() {
   const handleOnDownload = async () => {
     const temp = stageRef.current;
     if (temp == null) return null;
-    // データURL形式で値を取得できる
-    const result = temp.toDataURL({ pixelRatio: 3 });
+    // データURL形式で値を取得する
+    const result = temp.toDataURL({ pixelRatio: 3, mimeType: "image/jpeg" });
     await downloadImage(result, profileImage?.name);
   };
 
