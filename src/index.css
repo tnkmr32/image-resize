@@ -40,7 +40,7 @@ code {
 
 .canvas {
   border: solid 1px #000000;
-  /* background-color: #fffffff1; */
+  /* background-color: #ffffffff; */
   width: fit-content;
   height: fit-content;
 }

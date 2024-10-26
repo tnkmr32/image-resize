@@ -100,7 +100,7 @@ function App() {
             <ColoredRect
               width={canvasSize}
               height={canvasSize}
-              color="#fffffff1"
+              color="#ffffffff"
             />
             <Image
               image={image}
