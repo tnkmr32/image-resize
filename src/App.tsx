@@ -48,7 +48,7 @@ function App() {
   const canvasSize = 500;
   const MARGIN_DEFAULT = 50;
   const [margin, setMargin] = useState(MARGIN_DEFAULT);
-  
+
   const onChangeSlider = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.value) return;
     const num = Number(e.target.value);
@@ -58,7 +58,7 @@ function App() {
 
   const stageRef = useRef<Konva.Stage>(null);
 
-  const handleOnDownload = async() => {
+  const handleOnDownload = async () => {
     const temp = stageRef.current;
     if (temp == null) return null;
     // データURL形式で値を取得できる
@@ -74,7 +74,7 @@ function App() {
     }
 
     // アスペクト比。1以上が横向き
-    const aspect = image.width / image.height; 
+    const aspect = image.width / image.height;
 
     let width = 0;
     let height = 0;
@@ -100,7 +100,7 @@ function App() {
             <ColoredRect
               width={canvasSize}
               height={canvasSize}
-              color="#fcfaf7"
+              color="#fffffff1"
             />
             <Image
               image={image}
