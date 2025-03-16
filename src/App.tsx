@@ -129,6 +129,7 @@ function App() {
             className="pl-4"
             onDoubleClick={() => setMargin(MARGIN_DEFAULT)}
           />
+          {margin}
         </div>
 
         <button
