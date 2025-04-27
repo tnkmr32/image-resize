@@ -46,7 +46,7 @@ function App() {
   };
 
   const canvasSize = 500;
-  const MARGIN_DEFAULT = 50;
+  const MARGIN_DEFAULT = 25;
   const [margin, setMargin] = useState(MARGIN_DEFAULT);
 
   const onChangeSlider = (e: React.ChangeEvent<HTMLInputElement>) => {
